@@ -176,6 +176,11 @@ Found 2 items
 5555AmitNJ
 6666NinaNY
 
+# What are the different ways to connect to hive
+1. hive
+2. hue - hadoop user experience
+3. beeline
+
 
 
 
