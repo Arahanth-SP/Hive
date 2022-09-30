@@ -291,7 +291,212 @@ There are 3 major ways to connect to Hive
 
 1. hive
 2. hue - hadoop user experience
-3. beeline
+3. beeline (most preferred choice)
+
+#### Connecting to Hive using beeline
+
+beeline gives you a better view also, it is secured.
+
+beeline -u jdbc:hive2://
+
+
+[cloudera@quickstart ~]$ beeline -u jdbc:hive2://
+
+[cloudera@quickstart ~]$ beeline -u jdbc:hive2://
+
+scan complete in 11ms
+Connecting to jdbc:hive2://
+Connected to: Apache Hive (version 1.1.0-cdh5.13.0)
+Driver: Hive JDBC (version 1.1.0-cdh5.13.0)
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+Beeline version 1.1.0-cdh5.13.0 by Apache Hive
+0: jdbc:hive2://> 
+
+#### beeline query
+
+0: jdbc:hive2://> show databases;
+OK
++----------------+--+
+| database_name  |
++----------------+--+
+| default        |
+| trendytech     |
++----------------+--+
+2 rows selected (4.014 seconds)
+
+#### beeline Query
+
+0: jdbc:hive2://> use trendytech;
+OK
+No rows affected (0.182 seconds)
+0: jdbc:hive2://> show tables;
+OK
++------------+--+
+|  tab_name  |
++------------+--+
+| customers  |
+| orders     |
++------------+--+
+2 rows selected (0.259 seconds)
+
+#### beeline Query
+
+0: jdbc:hive2://> select * from customers;
+OK
++---------------+-----------------+--------------------+--+
+| customers.id  | customers.name  | customers.address  |
++---------------+-----------------+--------------------+--+
+| 1111          | John            | WA                 |
+| 2222          | Emily           | WA                 |
+| 3333          | Rick            | WA                 |
+| 4444          | Jane            | CA                 |
+| 5555          | Amit            | NJ                 |
+| 6666          | Nina            | NY                 |
++---------------+-----------------+--------------------+--+
+6 rows selected (2.041 seconds)
+
+#### beeline Query Describe Customers
+
+0: jdbc:hive2://> describe customers;
+OK
++-----------+------------+----------+--+
+| col_name  | data_type  | comment  |
++-----------+------------+----------+--+
+| id        | bigint     |          |
+| name      | string     |          |
+| address   | string     |          |
++-----------+------------+----------+--+
+3 rows selected (0.311 seconds)
+
+#### beeline Query
+#### To Exit from beeline !q
+
+0: jdbc:hive2://> !q
+
+#### Consider that you have not connected to hive or beeline then if you want to run a adhoc query.
+
+beeline -u jdbc:hive2:// -e "select * from trendytech.customers"
+
+#### The above command performs 3 things
+1. It will connect to beeline
+2. It will execute the Query " select * from trendytech.customers"
+3. It will come out of beeline
+
+[cloudera@quickstart ~]$ beeline -u jdbc:hive2:// -e "select * from trendytech.customers"
+
+scan complete in 13ms
+Connecting to jdbc:hive2://
+Connected to: Apache Hive (version 1.1.0-cdh5.13.0)
+Driver: Hive JDBC (version 1.1.0-cdh5.13.0)
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+OK
++---------------+-----------------+--------------------+--+
+| customers.id  | customers.name  | customers.address  |
++---------------+-----------------+--------------------+--+
+| 1111          | John            | WA                 |
+| 2222          | Emily           | WA                 |
+| 3333          | Rick            | WA                 |
+| 4444          | Jane            | CA                 |
+| 5555          | Amit            | NJ                 |
+| 6666          | Nina            | NY                 |
++---------------+-----------------+--------------------+--+
+6 rows selected (5.292 seconds)
+Beeline version 1.1.0-cdh5.13.0 by Apache Hive
+Closing: 0: jdbc:hive2://
+
+#### You want to write a script with HQL Queries
+
+show databases;
+use trendytech;
+select * from customers;
+
+
+#### PWD and gedit
+[cloudera@quickstart ~]$ pwd
+/home/cloudera
+[cloudera@quickstart ~]$ gedit myscript.hql
+
+Paste in gedit script the following HQL Queries
+
+show databases;
+use trendytech;
+select * from customers;
+
+#### See the content of gedit using cat command
+[cloudera@quickstart ~]$ cat myscript.hql
+show databases;
+use trendytech;
+select * from customers;
+
+#### The below command should be executed from terminal
+#### what if we are already logged into hive or beeline and you want to execute a script
+#### connect to beeline and want to execute the file indicating the path 
+
+beeline -u jdbc:hive2:// -f /home/cloudera/myscript.hql
+
+[cloudera@quickstart ~]$ beeline -u jdbc:hive2:// -f /home/cloudera/myscript.hql
+scan complete in 7ms
+Connecting to jdbc:hive2://
+Connected to: Apache Hive (version 1.1.0-cdh5.13.0)
+Driver: Hive JDBC (version 1.1.0-cdh5.13.0)
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+0: jdbc:hive2://> show databases;
+OK
++----------------+--+
+| database_name  |
++----------------+--+
+| default        |
+| trendytech     |
++----------------+--+
+2 rows selected (4.677 seconds)
+0: jdbc:hive2://> use trendytech;
+OK
+No rows affected (0.149 seconds)
+0: jdbc:hive2://> select * from customers;
+OK
++---------------+-----------------+--------------------+--+
+| customers.id  | customers.name  | customers.address  |
++---------------+-----------------+--------------------+--+
+| 1111          | John            | WA                 |
+| 2222          | Emily           | WA                 |
+| 3333          | Rick            | WA                 |
+| 4444          | Jane            | CA                 |
+| 5555          | Amit            | NJ                 |
+| 6666          | Nina            | NY                 |
++---------------+-----------------+--------------------+--+
+6 rows selected (2.738 seconds)
+0: jdbc:hive2://> 
+0: jdbc:hive2://> 
+0: jdbc:hive2://> 
+Closing: 0: jdbc:hive2://
+
+#### The below command should be executed from terminal
+#### what if we are already logged into hive or beeline and you want to execute a script
+
+0: jdbc:hive2://> source /home/cloudera/myscript.hql;
+OK
++----------------+--+
+| database_name  |
++----------------+--+
+| default        |
+| trendytech     |
++----------------+--+
+2 rows selected (4.33 seconds)
+OK
+No rows affected (0.147 seconds)
+OK
++---------------+-----------------+--------------------+--+
+| customers.id  | customers.name  | customers.address  |
++---------------+-----------------+--------------------+--+
+| 1111          | John            | WA                 |
+| 2222          | Emily           | WA                 |
+| 3333          | Rick            | WA                 |
+| 4444          | Jane            | CA                 |
+| 5555          | Amit            | NJ                 |
+| 6666          | Nina            | NY                 |
++---------------+-----------------+--------------------+--+
+6 rows selected (2.465 seconds)
+
 
 
 
