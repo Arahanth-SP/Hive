@@ -447,6 +447,120 @@ Time taken: 0.105 seconds, Fetched: 6 row(s)
 
 # Views in HIVE
 
+# Describe Table Customers and Table Orders
+
+hive> describe customers;
+OK
+id                  	bigint              	                    
+name                	string              	                    
+address             	string              	                    
+Time taken: 0.174 seconds, Fetched: 3 row(s)
+hive> describe orders;
+OK
+id                  	bigint              	                    
+product_id          	string              	                    
+customer_id         	bigint              	                    
+quantity            	int                 	                    
+amount              	double              	                    
+Time taken: 0.228 seconds, Fetched: 5 row(s)
+
+
+create view customer_purchases as
+select customer_id, product_id, address from customers JOIN
+orders
+where customers.id = orders.customer_id;
+
+hive> create view customer_purchases as
+    > select customer_id, product_id, address from customers JOIN
+    > orders
+    > where customers.id = orders.customer_id;
+OK
+Time taken: 0.256 seconds
+
+hive> show tables;
+OK
+customer_purchases
+customers
+freshproducts
+orders
+products
+products_managed
+Time taken: 0.089 seconds, Fetched: 6 row(s)
+
+# Describe Formatted View
+hive> describe formatted customer_purchases;
+OK
+# col_name            	data_type           	comment             
+	 	 
+customer_id         	bigint              	                    
+product_id          	string              	                    
+address             	string              	                    
+	 	 
+# Detailed Table Information	 	 
+Database:           	trendytech          	 
+Owner:              	cloudera            	 
+CreateTime:         	Sat Oct 01 05:47:21 PDT 2022	 
+LastAccessTime:     	UNKNOWN             	 
+Protect Mode:       	None                	 
+Retention:          	0                   	 
+Table Type:         	VIRTUAL_VIEW        	 
+Table Parameters:	 	 
+	transient_lastDdlTime	1664628441          
+	 	 
+# Storage Information	 	 
+SerDe Library:      	null                	 
+InputFormat:        	org.apache.hadoop.mapred.TextInputFormat	 
+OutputFormat:       	org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat	 
+Compressed:         	No                  	 
+Num Buckets:        	-1                  	 
+Bucket Columns:     	[]                  	 
+Sort Columns:       	[]                  	 
+	 	 
+# View Information	 	 
+View Original Text: 	select customer_id, product_id, address from customers JOIN	 
+orders	 	 
+where customers.id = orders.customer_id	 	 
+View Expanded Text: 	select `orders`.`customer_id`, `orders`.`product_id`, `customers`.`address` from `trendytech`.`customers` JOIN	 
+`trendytech`.`orders`	 	 
+where `customers`.`id` = `orders`.`customer_id`	 	 
+Time taken: 0.262 seconds, Fetched: 33 row(s)
+
+
+# Select * from View
+
+hive> select * from customer_purchases;
+Query ID = cloudera_20221001055050_400a3fcc-1bba-4895-af2d-55a1fda637b3
+Total jobs = 1
+Execution log at: /tmp/cloudera/cloudera_20221001055050_400a3fcc-1bba-4895-af2d-55a1fda637b3.log
+2022-10-01 05:50:26	Starting to launch local task to process map join;	maximum memory = 1013645312
+2022-10-01 05:50:32	Dump the side-table for tag: 0 with group count: 6 into file: file:/tmp/cloudera/bffc2646-24cf-40b7-8613-8d45e1587692/hive_2022-10-01_05-50-02_477_1762107259776258907-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile50--.hashtable
+2022-10-01 05:50:32	Uploaded 1 File to: file:/tmp/cloudera/bffc2646-24cf-40b7-8613-8d45e1587692/hive_2022-10-01_05-50-02_477_1762107259776258907-1/-local-10003/HashTable-Stage-3/MapJoin-mapfile50--.hashtable (404 bytes)
+2022-10-01 05:50:32	End of local task; Time Taken: 6.784 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1662730789713_0028, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1662730789713_0028/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1662730789713_0028
+Hadoop job information for Stage-3: number of mappers: 1; number of reducers: 0
+2022-10-01 05:51:04,948 Stage-3 map = 0%,  reduce = 0%
+2022-10-01 05:51:29,557 Stage-3 map = 100%,  reduce = 0%, Cumulative CPU 5.45 sec
+MapReduce Total cumulative CPU time: 5 seconds 450 msec
+Ended Job = job_1662730789713_0028
+MapReduce Jobs Launched: 
+Stage-Stage-3: Map: 1   Cumulative CPU: 5.45 sec   HDFS Read: 7387 HDFS Write: 73 SUCCESS
+Total MapReduce CPU Time Spent: 5 seconds 450 msec
+OK
+1111	phone	WA
+1111	camera	WA
+1111	broom	WA
+2222	broom	WA
+4444	t-shirt	CA
+Time taken: 88.329 seconds, Fetched: 5 row(s)
+
+
+# View Index
+
 
 
 
