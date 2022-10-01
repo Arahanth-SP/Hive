@@ -1,0 +1,113 @@
+# Hive Explode and Lateral View
+
+The system defined function in hive fall in 3 categories
+
+1. UDF - one line as input and one line as output - length
+2. UDAF - multiple input lines and one output row - max, min, sum
+3. UDTF - one input and multiple output- explode function
+
+Example: Array Where Input is one line and output is multiple
+[1,2,3,4,5]
+1
+2
+3
+4
+5
+
+[cloudera@quickstart Downloads]$ cd Downloads
+bash: cd: Downloads: No such file or directory
+[cloudera@quickstart Downloads]$ cd
+[cloudera@quickstart ~]$ cd Downloads
+[cloudera@quickstart Downloads]$ cd
+[cloudera@quickstart ~]$ cd Downloads/
+[cloudera@quickstart Downloads]$ cat authors.csv
+Salman Rushide,Grimus:Shame:Fury
+Thomas Otway,Don Carlos:The Orphan
+Ben Jonson,Volpone:Epicene
+John Milton,Arcades:Comus[cloudera@quickstart Downloads]$ 
+
+
+# Creating Table Author_Details that depicts example for Explode and Lateral View
+
+use trendytech;
+create table author_details(author_name string, book_names array
+<string>) row format delimited fields terminated by ',' collection items terminated by ":";
+
+hive> create table author_details(author_name string, book_names array
+    > <string>) row format delimited fields terminated by ',' collection items terminated by ":";
+OK
+Time taken: 0.131 seconds
+
+# Now we are loading data into Table author_details;
+
+load data local inpath '/home/cloudera/Downloads/authors.csv' into table author_details;
+
+hive> load data local inpath '/home/cloudera/Downloads/authors.csv' into table author_details;
+Loading data to table trendytech.author_details
+Table trendytech.author_details stats: [numFiles=1, totalSize=120]
+OK
+Time taken: 0.795 seconds
+
+hive> select * from author_details;
+OK
+Salman Rushide	["Grimus","Shame","Fury"]
+Thomas Otway	["Don Carlos","The Orphan"]
+Ben Jonson	["Volpone","Epicene"]
+John Milton	["Arcades","Comus"]
+Time taken: 0.09 seconds, Fetched: 4 row(s)
+
+# Use Explode on array column type
+
+describe author_details;
+
+select explode(book_names) from author_details;
+
+hive> select explode(book_names) from author_details;
+OK
+Grimus
+Shame
+Fury
+Don Carlos
+The Orphan
+Volpone
+Epicene
+Arcades
+Comus
+Time taken: 0.098 seconds, Fetched: 9 row(s)
+
+
+
+# The Exploded column should be made as a virtual table (lateral view) and this is then joined with the acutal table
+
+select author_name, b_name from author_details lateral view explode 
+(book_names) book_table as b_name;
+
+# table1 author_details
+# join lateral view
+# table2 explode(book_names)
+# alias name of table2 is book_table
+# b_name is the column name in virtual table (book_table)
+
+hive> select author_name, b_name from author_details lateral view explode 
+    > (book_names) book_table as b_name;
+OK
+Salman Rushide	Grimus
+Salman Rushide	Shame
+Salman Rushide	Fury
+Thomas Otway	Don Carlos
+Thomas Otway	The Orphan
+Ben Jonson	Volpone
+Ben Jonson	Epicene
+John Milton	Arcades
+John Milton	Comus
+Time taken: 0.129 seconds, Fetched: 9 row(s)
+
+
+
+
+
+
+
+
+
+
