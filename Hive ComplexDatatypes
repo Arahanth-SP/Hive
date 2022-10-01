@@ -269,6 +269,15 @@ samsungj7	 Samsung J7	250.0	[" red","blue","black"]	[5.5]	{"camera":true,"dualsi
 oneplusthree	 One Plus Three	450.0	[" gold","silver"]	[4.5,5.5]	{"autofocus":true}	{"battery":"12 hours","camera":null}
 Time taken: 0.143 seconds, Fetched: 6 row(s)
 
+hive> select id, features['camera'],information.battery from mobilephones;
+OK
+	NULL	NULL
+	NULL	NULL
+	NULL	NULL
+	NULL	NULL
+samsungj7	true	24 hours
+oneplusthree	NULL	12 hours
+Time taken: 0.117 seconds, Fetched: 6 row(s)
 
 
 
