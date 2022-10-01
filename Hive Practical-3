@@ -271,6 +271,61 @@ hive> dfs -ls /user/hive/warehouse/trendytech.db/test;
 Found 1 items
 -rwxrwxrwx   1 cloudera supergroup         11 2022-09-30 19:42 /user/hive/warehouse/trendytech.db/test/000000_0
 
+# Describe Formatted Table
+hive> describe formatted test;
+
+Location:           	hdfs://quickstart.cloudera:8020/user/hive/warehouse/trendytech.db/test	 
+Table Type:         	MANAGED_TABLE       	 
+Table Parameters:	 	 
+	COLUMN_STATS_ACCURATE	true                
+	numFiles            	1                   
+	numRows             	1                   
+	rawDataSize         	10                  
+	totalSize           	11                  
+	transient_lastDdlTime	1664592132          
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe	 
+InputFormat:        	org.apache.hadoop.mapred.TextInputFormat	 
+OutputFormat:       	org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat	 
+Compressed:         	No                  	 
+Num Buckets:        	-1                  	 
+Bucket Columns:     	[]                  	 
+Sort Columns:       	[]                  	 
+Storage Desc Params:	 	 
+	serialization.format	1                   
+Time taken: 0.184 seconds, Fetched: 32 row(s)
+
+# Drop Table test
+
+hive> drop table test;
+OK
+Time taken: 1.273 seconds
+
+hive> dfs -ls /user/hive/warehouse/trendtech.db/test;
+ls: `/user/hive/warehouse/trendtech.db/test': No such file or directory
+Command -ls /user/hive/warehouse/trendtech.db/test failed with exit code = 1
+Query returned non-zero code: 1, cause: null
+
+hive> describe formatted test;
+FAILED: SemanticException [Error 10001]: Table not found test
+
+1. We created table called test with two columns
+2. We have inserted record
+3. we dropped the table to see both the data and metadata are deleted since this is a managed table.
+
+how many ways are there to insert data in a table.
+1. insert commands (these run mapreduce and takes lot of time. This is not an efficient way)
+2. loading the data from files  (this is the most preferred or industry ready way)
+
+Load the data from HDFS
+Load the data from local file system
+
+3. load data from one table to another
+
+
+
+
 
 
 
