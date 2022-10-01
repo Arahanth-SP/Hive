@@ -1,1 +1,275 @@
 
+#Complex Datatypes in Hive
+
+# Any data type which holds more then one value are complex data types
+# Hive has support for 4 types of Complex Data:
+1. Array
+2. Map
+3. Struct
+4. Union (Rarely used because of incomplete support in Hive)
+
+# Arrays: 
+# Collection of items of similar data type. An array can contain one or more values of the same data type.
+
+# Create a Table with Array data types
+create table mobilephones (
+id string,
+title string,
+cost float,
+colors array<string>,
+screen_size array<float>
+);
+
+hive> create table mobilephones (
+    > id string,
+    > title string,
+    > cost float,
+    > colors array<string>,
+    > screen_size array<float>
+    > );
+OK
+Time taken: 0.146 seconds
+
+hive> describe mobilephones;
+OK
+id                  	string              	                    
+title               	string              	                    
+cost                	float               	                    
+colors              	array<string>       	                    
+screen_size         	array<float>        	                    
+Time taken: 0.168 seconds, Fetched: 5 row(s)
+
+# Inserting some values into Table mobilephones
+
+insert into table mobilephones
+select "redminote7", "Redmi Note 7", 300, array("white","silver",
+"black"), array(float(4.5))
+UNION ALL
+select "motoGplus","Moto G Plus", 200, array("black","gold"),
+array(float(4.5), float(5.5));
+
+hive> insert into table mobilephones
+    > select "redminote7", "Redmi Note 7", 300, array("white","silver",
+    > "black"), array(float(4.5))
+    > UNION ALL
+    > select "motoGplus","Moto G Plus", 200, array("black","gold"),
+    > array(float(4.5), float(5.5));
+Query ID = cloudera_20221001082424_0d560c4c-e46a-43e5-906f-c8cadf2a0dc6
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1662730789713_0029, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1662730789713_0029/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1662730789713_0029
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2022-10-01 08:24:44,744 Stage-1 map = 0%,  reduce = 0%
+2022-10-01 08:25:20,356 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 7.33 sec
+MapReduce Total cumulative CPU time: 7 seconds 330 msec
+Ended Job = job_1662730789713_0029
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/trendytech.db/mobilephones/.hive-staging_hive_2022-10-01_08-24-08_945_5998076201243766594-1/-ext-10000
+Loading data to table trendytech.mobilephones
+Table trendytech.mobilephones stats: [numFiles=1, numRows=2, totalSize=100, rawDataSize=98]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 7.33 sec   HDFS Read: 6171 HDFS Write: 179 SUCCESS
+Total MapReduce CPU Time Spent: 7 seconds 330 msec
+OK
+Time taken: 73.771 seconds
+
+hive> select * from mobilephones;
+OK
+redminote7	Redmi Note 7	300.0	["white","silver","black"]	[4.5]
+motoGplus	Moto G Plus	200.0	["black","gold"]	[4.5,5.5]
+Time taken: 0.139 seconds, Fetched: 2 row(s)
+
+hive> select id, colors from mobilephones;
+OK
+redminote7	["white","silver","black"]
+motoGplus	["black","gold"]
+Time taken: 0.129 seconds, Fetched: 2 row(s)
+
+hive> select id, colors[0] from mobilephones;
+OK
+redminote7	white
+motoGplus	black
+Time taken: 0.105 seconds, Fetched: 2 row(s)
+
+hive> select id, colors[1] from mobilephones;
+OK
+redminote7	silver
+motoGplus	gold
+Time taken: 0.105 seconds, Fetched: 2 row(s)
+
+# Creating one more table with by name mobilephones_new with same schema
+create table mobilephones_new (
+id string,
+title string,
+cost float,
+colors array<string>,
+screen_size array<float>
+) row format delimited fields terminated by ',' collection items terminated by '#';
+
+hive> create table mobilephones_new (
+    > id string,
+    > title string,
+    > cost float,
+    > colors array<string>,
+    > screen_size array<float>
+    > ) row format delimited fields terminated by ',' collection items terminated by '#';
+OK
+Time taken: 0.146 seconds
+
+# Loading data 
+
+load data local inpath '/home/cloudera/Downloads/mobilephones_new.csv'
+into table mobilephones_new;
+
+hive> load data local inpath '/home/cloudera/Downloads/mobilephones_new.csv'
+    > into table mobilephones_new;
+Loading data to table trendytech.mobilephones_new
+Table trendytech.mobilephones_new stats: [numFiles=1, totalSize=171]
+OK
+Time taken: 0.377 seconds
+
+# Drop Table mobilephones as we are creating another with additional information
+hive> drop table mobilephones;
+OK
+Time taken: 0.244 seconds
+
+#Create Table mobilephones with additional information
+
+create table mobilephones (
+id string,
+title string,
+cost float,
+colors array<string>,
+screen_size array<float>,
+features map<string,boolean>
+) row format delimited fields terminated by ',' collection items 
+terminated by '#' map keys terminated by ':';
+
+hive> create table mobilephones (
+    > id string,
+    > title string,
+    > cost float,
+    > colors array<string>,
+    > screen_size array<float>,
+    > features map<string,boolean>
+    > ) row format delimited fields terminated by ',' collection items 
+    > terminated by '#' map keys terminated by ':';
+OK
+Time taken: 0.1 seconds
+
+# Loading the data 
+
+load data local inpath '/home/cloudera/Downloads/mobilephones_new.csv'
+into table mobilephones;
+
+hive> load data local inpath '/home/cloudera/Downloads/mobilephones_new.csv'
+    > into table mobilephones;
+Loading data to table trendytech.mobilephones
+Table trendytech.mobilephones stats: [numFiles=1, totalSize=171]
+OK
+Time taken: 0.403 seconds
+
+
+hive> select * from mobilephones;
+OK
+	NULL	NULL	NULL	NULL	NULL
+	NULL	NULL	NULL	NULL	NULL
+	NULL	NULL	NULL	NULL	NULL
+	NULL	NULL	NULL	NULL	NULL
+samsungj7	 Samsung J7	250.0	[" red","blue","black"]	[5.5]	{"camera":true,"dualsim":false}
+oneplusthree	 One Plus Three	450.0	[" gold","silver"]	[4.5,5.5]	{"autofocus":true}
+Time taken: 0.115 seconds, Fetched: 6 row(s)
+
+select id, features['camera'] from mobilephones;
+
+hive> select id, features['camera'] from mobilephones;
+OK
+	NULL
+	NULL
+	NULL
+	NULL
+samsungj7	true
+oneplusthree	NULL
+Time taken: 0.129 seconds, Fetched: 6 row(s)
+
+# Struct
+
+# A struct is somewhat like a class
+# This can hold elements of different datatypes.
+
+Example:
+Student Struct:
+  student_id
+  student_name
+  student_marks
+
+hive> drop table mobilephones;
+OK
+Time taken: 0.166 seconds
+
+
+create table mobilephones (
+id string,
+title string,
+cost float,
+colors array<string>,
+screen_size array<float>,
+features map<string,boolean>,
+information struct<battery:string,camera:string>
+) row format delimited fields terminated by ',' collection items 
+terminated by '#' map keys terminated by ':';
+
+hive> create table mobilephones (
+    > id string,
+    > title string,
+    > cost float,
+    > colors array<string>,
+    > screen_size array<float>,
+    > features map<string,boolean>,
+    > information struct<battery:string,camera:string>
+    > ) row format delimited fields terminated by ',' collection items 
+    > terminated by '#' map keys terminated by ':';
+OK
+Time taken: 0.098 seconds
+
+hive> describe mobilephones;
+OK
+id                  	string              	                    
+title               	string              	                    
+cost                	float               	                    
+colors              	array<string>       	                    
+screen_size         	array<float>        	                    
+features            	map<string,boolean> 	                    
+information         	struct<battery:string,camera:string>	                    
+Time taken: 0.135 seconds, Fetched: 7 row(s)
+
+
+load data local inpath '/home/cloudera/Downloads/mobilephones_new.csv'
+into table mobilephones;
+
+hive> load data local inpath '/home/cloudera/Downloads/mobilephones_new.csv'
+    > into table mobilephones;
+Loading data to table trendytech.mobilephones
+Table trendytech.mobilephones stats: [numFiles=1, totalSize=171]
+OK
+Time taken: 0.377 seconds
+
+
+hive> select * from mobilephones;
+OK
+	NULL	NULL	NULL	NULL	NULL	NULL
+	NULL	NULL	NULL	NULL	NULL	NULL
+	NULL	NULL	NULL	NULL	NULL	NULL
+	NULL	NULL	NULL	NULL	NULL	NULL
+samsungj7	 Samsung J7	250.0	[" red","blue","black"]	[5.5]	{"camera":true,"dualsim":false}	{"battery":"24 hours","camera":"2MP"}
+oneplusthree	 One Plus Three	450.0	[" gold","silver"]	[4.5,5.5]	{"autofocus":true}	{"battery":"12 hours","camera":null}
+Time taken: 0.143 seconds, Fetched: 6 row(s)
+
+
+
+
+
