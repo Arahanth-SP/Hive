@@ -1,0 +1,172 @@
+
+#Subqueries
+
+#We can write Subqueries not only on Tables but also on Tabular Format
+
+Select * from table1;
+
+Select * from (table/tabular result)
+
+# Subqueries are queries which return a result set which are nested within other queries.
+Subqueries can be used:
+1. FROM clause
+2. WHERE clause
+
+create table products (
+id string,
+title string,
+cost float
+)row format deleimited fields terminated by ',' stored as textfile;
+
+
+[cloudera@quickstart ~]$ cd Downloads
+[cloudera@quickstart Downloads]$ cat products.csv
+cat: products.csv: No such file or directory
+[cloudera@quickstart Downloads]$ cat products.csv
+iphone7, iPhone 7, 950
+camera_canon, Canon 570x, 1000
+washingmachine_samsung, Samsung Swift, 400
+tv_vu, Vu 56 Inch, 600
+ 
+# Loading data products.csv into products table
+
+load data local inpath '/home/cloudera/Downloads/products.csv' into table products;
+
+hive> load data local inpath '/home/cloudera/Downloads/products.csv' into table products;
+Loading data to table trendytech.products
+Table trendytech.products stats: [numFiles=2, numRows=0, totalSize=246, rawDataSize=0]
+OK
+Time taken: 1.767 seconds
+
+hive> select * from products;
+OK
+iphone7	 iPhone 7	950.0
+camera_canon	 Canon 570x	1000.0
+washingmachine_samsung	 Samsung Swift	400.0
+tv_vu	 Vu 56 Inch	600.0
+ 	NULL	NULL
+	NULL	NULL
+iphone7	 iPhone 7	950.0
+camera_canon	 Canon 570x	1000.0
+washingmachine_samsung	 Samsung Swift	400.0
+tv_vu	 Vu 56 Inch	600.0
+ 	NULL	NULL
+	NULL	NULL
+Time taken: 1.453 seconds, Fetched: 12 row(s)
+
+# Create a new table freshproducts
+
+hive> create table freshproducts (
+    > id string,
+    > title string,
+    > cost float
+    > )
+    > row format delimited fields terminated by ',' stored as textfile;
+OK
+Time taken: 0.106 seconds
+
+[cloudera@quickstart Downloads]$ cat freshproducts.csv
+broccolli, Broccoli, 5
+spinach, Spinach, 7
+carrot, Local Carrots, 4
+potato, Idaho Potatoes, 4
+
+# Loading freshproducts.csv file into table freshproducts
+hive> load data local inpath '/home/cloudera/Downloads/freshproducts.csv'into table freshproducts;
+Loading data to table trendytech.freshproducts
+Table trendytech.freshproducts stats: [numFiles=1, totalSize=95]
+OK
+Time taken: 0.487 seconds
+
+hive> select * from freshproducts;
+OK
+broccolli	 Broccoli	5.0
+spinach	 Spinach	7.0
+carrot	 Local Carrots	4.0
+potato	 Idaho Potatoes	4.0
+	NULL	NULL
+Time taken: 0.179 seconds, Fetched: 5 row(s)
+
+# Writing a Subquery for products and freshproducts
+
+select *
+From 
+( select id as product_id from products
+UNION ALL
+select id as product_id from freshproducts
+) t;
+
+#Subquery
+
+hive> select *
+    > From 
+    > ( select id as product_id from products
+    > UNION ALL
+    > select id as product_id from freshproducts
+    > ) t;
+Query ID = cloudera_20221001030404_fe69c54a-50b4-441b-b33a-ab6071c58897
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1662730789713_0021, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1662730789713_0021/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1662730789713_0021
+Hadoop job information for Stage-1: number of mappers: 2; number of reducers: 0
+2022-10-01 03:05:42,849 Stage-1 map = 0%,  reduce = 0%
+2022-10-01 03:06:43,431 Stage-1 map = 0%,  reduce = 0%
+2022-10-01 03:06:52,248 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 10.11 sec
+MapReduce Total cumulative CPU time: 10 seconds 110 msec
+Ended Job = job_1662730789713_0021
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 2   Cumulative CPU: 10.11 sec   HDFS Read: 10128 HDFS Write: 139 SUCCESS
+Total MapReduce CPU Time Spent: 10 seconds 110 msec
+OK
+iphone7
+camera_canon
+washingmachine_samsung
+tv_vu
+ 
+
+iphone7
+camera_canon
+washingmachine_samsung
+tv_vu
+ 
+
+broccolli
+spinach
+carrot
+potato
+
+Time taken: 118.211 seconds, Fetched: 17 row(s)
+
+# Creating Subquery from customers table and orders table
+
+hive> select * from customers;
+OK
+1111	John	WA
+2222	Emily	WA
+3333	Rick	WA
+4444	Jane	CA
+5555	Amit	NJ
+6666	Nina	NY
+Time taken: 0.156 seconds, Fetched: 6 row(s)
+hive> select * from orders;
+OK
+111111	phone	1111	3	1200.0
+111112	camera	1111	1	5200.0
+111113	broom	1111	1	10.0
+111114	broom	2222	2	20.0
+111115	t-shirt	4444	2	66.0
+Time taken: 0.094 seconds, Fetched: 5 row(s)
+
+# select distinct (t.product_id)
+FROM (
+select product_id from customers
+JOIN
+orders where customers.id = orders.customer_id ) t
+
+
+
+
+
+
