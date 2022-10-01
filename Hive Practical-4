@@ -1,0 +1,65 @@
+# How many ways are there to insert data into table
+
+1. inserts commands (these run mapreduce and takes lot of time. This is not efficient way)
+2. loading the data from files ( this is the most preferred or industry ready way).
+
+load the data from  local file system
+load the data from hdfs
+3. load data from one table to another
+
+# Downloading the products.csv file into home/clouder folder
+
+[cloudera@quickstart ~]$ ls
+cloudera-manager  eclipse                     myscript.hql~  --table
+cm_api.py         enterprise-deployment.json  orders.java    --targer
+--connect         express-deployment.json     parcels        Templates
+Desktop           kerberos                    --password     --username
+dir1              lib                         Pictures       Videos
+Documents         Music                       products.csv   workspace
+Downloads         myscript.hql                Public
+
+[cloudera@quickstart ~]$ pwd
+/home/cloudera
+
+[cloudera@quickstart ~]$ ls
+cloudera-manager  eclipse                     myscript.hql~  --table
+cm_api.py         enterprise-deployment.json  orders.java    --targer
+--connect         express-deployment.json     parcels        Templates
+Desktop           kerberos                    --password     --username
+dir1              lib                         Pictures       Videos
+Documents         Music                       products.csv   workspace
+Downloads         myscript.hql                Public
+[cloudera@quickstart ~]$ ls -ltr
+
+total 224
+-rwxrwxr-x  1 cloudera cloudera  4228 Oct 23  2017 parcels
+drwxrwxr-x  2 cloudera cloudera  4096 Oct 23  2017 lib
+-rwxrwxr-x  1 cloudera cloudera  5007 Oct 23  2017 kerberos
+-rw-rw-r--  1 cloudera cloudera 50515 Oct 23  2017 express-deployment.json
+-rw-rw-r--  1 cloudera cloudera 53655 Oct 23  2017 enterprise-deployment.json
+drwxrwxr-x  4 cloudera cloudera  4096 Oct 23  2017 Documents
+-rwxrwxr-x  1 cloudera cloudera  9964 Oct 23  2017 cm_api.py
+-rwxrwxr-x  1 cloudera cloudera  5387 Oct 23  2017 cloudera-manager
+drwxr-xr-x  2 cloudera cloudera  4096 Sep  6 11:06 Videos
+drwxr-xr-x  2 cloudera cloudera  4096 Sep  6 11:06 Templates
+drwxr-xr-x  2 cloudera cloudera  4096 Sep  6 11:06 Public
+drwxr-xr-x  2 cloudera cloudera  4096 Sep  6 11:06 Pictures
+drwxr-xr-x  2 cloudera cloudera  4096 Sep  6 11:06 Music
+drwxrwxr-x  2 cloudera cloudera  4096 Sep  8 23:39 dir1
+drwxrwsr-x  9 cloudera cloudera  4096 Sep 16 06:03 eclipse
+drwxrwxr-x  6 cloudera cloudera  4096 Sep 16 07:48 workspace
+-rw-rw-r--  1 cloudera cloudera     0 Sep 19 11:45 --connect
+-rw-rw-r--  1 cloudera cloudera     0 Sep 19 20:08 --username
+-rw-rw-r--  1 cloudera cloudera     0 Sep 19 20:08 --table
+-rw-rw-r--  1 cloudera cloudera     0 Sep 19 20:08 --password
+-rw-rw-r--  1 cloudera cloudera   149 Sep 19 20:08 --targer
+-rw-rw-r--  1 cloudera cloudera 16344 Sep 19 20:21 orders.java
+-rw-rw-r--  1 cloudera cloudera    58 Sep 29 23:11 myscript.hql~
+-rw-rw-r--  1 cloudera cloudera    58 Sep 29 23:11 myscript.hql
+-rwxrwxrwx  1 cloudera cloudera   123 Sep 30 20:35 products.csv
+drwxr-xr-x  2 cloudera cloudera  4096 Sep 30 20:53 Downloads
+drwxrwxr-x 10 cloudera cloudera  4096 Oct  1 00:11 Desktop
+
+#Copying File products.csv from local to hdfs file system
+
+[cloudera@quickstart ~]$ hadoop fs -copyFromLocal /home/cloudera/Downloads/products.csv /data
