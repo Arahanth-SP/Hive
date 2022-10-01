@@ -1,0 +1,276 @@
+# Hive Session
+
+Connecting to Hive
+
+[cloudera@quickstart ~]$ hive
+
+Logging initialized using configuration in file:/etc/hive/conf.dist/hive-log4j.properties
+WARNING: Hive CLI is deprecated and migration to Beeline is recommended.
+
+# Show databases;
+# Type Ctrl + L to clear the screen
+
+hive> show databases;
+OK
+default
+trendytech
+Time taken: 2.313 seconds, Fetched: 2 row(s)
+
+# Create Database trendy
+
+hive> create database trendy;
+OK
+Time taken: 0.151 seconds
+
+# Show databases using wildcard character
+
+hive> show databases like 'tr*';
+OK
+trendy
+trendytech
+Time taken: 0.157 seconds, Fetched: 2 row(s)
+
+#Use database trendytech
+hive> use trendytech;
+OK
+Time taken: 0.057 seconds
+# Show tables
+hive> show tables;
+OK
+customers
+orders
+Time taken: 0.058 seconds, Fetched: 2 row(s)
+
+
+# A Hive table has 2 things
+1. Actual Data-hdfs (/user/hive/warehouse)
+
+2. meta data (Schema)-database
+
+If you go with raw versions of hadoop. it comes with derby database.
+
+# we are using cloudera's setup.
+#In cloudera quickstart VM we are having mysql as the database to handle metadata.
+#mysql is the industry choice
+#Inside mysql databases, there is a database named metastore whill will handle the metadata (schema)
+
+#The metadata for Hive tables are stored in the Hive Metastore
+# By default, the Hive Metastore stores all Hive Metadata in Derby database.
+#Derby is not recommended in production enviornment as it only allows one connection at a time.
+#MySQL is the best choice for the metastore becuase it is the most popular among the Hive user community
+
+# Connecting to mysql
+
+[cloudera@quickstart ~]$ mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 504
+Server version: 5.1.73 Source distribution
+
+Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+# Show databases
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| cm                 |
+| firehose           |
+| hue                |
+| metastore          |
+| mysql              |
+| nav                |
+| navms              |
+| oozie              |
+| retail_db          |
+| rman               |
+| sentry             |
+| trendytech         |
++--------------------+
+13 rows in set (0.00 sec)
+
+# Using Metastore Database
+mysql> use metastore;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+
+mysql> show tables;
++---------------------------+
+| Tables_in_metastore       |
++---------------------------+
+| BUCKETING_COLS            |
+| CDS                       |
+| COLUMNS_V2                |
+| COMPACTION_QUEUE          |
+| COMPLETED_TXN_COMPONENTS  |
+| DATABASE_PARAMS           |
+| DBS                       |
+| DB_PRIVS                  |
+| DELEGATION_TOKENS         |
+| FUNCS                     |
+| FUNC_RU                   |
+| GLOBAL_PRIVS              |
+| HIVE_LOCKS                |
+| IDXS                      |
+| INDEX_PARAMS              |
+| MASTER_KEYS               |
+| METASTORE_DB_PROPERTIES   |
+| NEXT_COMPACTION_QUEUE_ID  |
+| NEXT_LOCK_ID              |
+| NEXT_TXN_ID               |
+| NOTIFICATION_LOG          |
+| NOTIFICATION_SEQUENCE     |
+| NUCLEUS_TABLES            |
+| PARTITIONS                |
+| PARTITION_EVENTS          |
+| PARTITION_KEYS            |
+| PARTITION_KEY_VALS        |
+| PARTITION_PARAMS          |
+| PART_COL_PRIVS            |
+| PART_COL_STATS            |
+| PART_PRIVS                |
+| ROLES                     |
+| ROLE_MAP                  |
+| SDS                       |
+| SD_PARAMS                 |
+| SEQUENCE_TABLE            |
+| SERDES                    |
+| SERDE_PARAMS              |
+| SKEWED_COL_NAMES          |
+| SKEWED_COL_VALUE_LOC_MAP  |
+| SKEWED_STRING_LIST        |
+| SKEWED_STRING_LIST_VALUES |
+| SKEWED_VALUES             |
+| SORT_COLS                 |
+| TABLE_PARAMS              |
+| TAB_COL_STATS             |
+| TBLS                      |
+| TBL_COL_PRIVS             |
+| TBL_PRIVS                 |
+| TXNS                      |
+| TXN_COMPONENTS            |
+| TYPES                     |
+| TYPE_FIELDS               |
+| VERSION                   |
++---------------------------+
+54 rows in set (0.00 sec)
+
+# Select * from TBLS
+
+mysql> select * from TBLS;
+
+
+mysql> select * from TBLS;
++--------+-------------+-------+------------------+----------+-----------+-------+-----------+---------------+--------------------+--------------------+----------------+
+| TBL_ID | CREATE_TIME | DB_ID | LAST_ACCESS_TIME | OWNER    | RETENTION | SD_ID | TBL_NAME  | TBL_TYPE      | VIEW_EXPANDED_TEXT | VIEW_ORIGINAL_TEXT | LINK_TARGET_ID |
++--------+-------------+-------+------------------+----------+-----------+-------+-----------+---------------+--------------------+--------------------+----------------+
+|      1 |  1664388061 |     6 |                0 | cloudera |         0 |     1 | customers | MANAGED_TABLE | NULL               | NULL               |           NULL |
+|      2 |  1664392879 |     6 |                0 | cloudera |         0 |     2 | orders    | MANAGED_TABLE | NULL               | NULL               |           NULL |
++--------+-------------+-------+------------------+----------+-----------+-------+-----------+---------------+--------------------+--------------------+----------------+
+2 rows in set (0.00 sec)
+
+
+
+#### Data is stored in HDFS /user/hive/warehouse 
+/user/hive/warehouse/trendytech.db (for the trendytech db)
+/user/hive/warehouse/bigdatabysumit.db
+/user/hive/warehouse/orders
+
+# To Check the actual data located in HDFS
+
+[cloudera@quickstart ~]$ hadoop fs -ls /user/hive/warehouse/trendytech.db
+Found 2 items
+drwxrwxrwx   - cloudera supergroup          0 2022-09-28 11:25 /user/hive/warehouse/trendytech.db/customers
+drwxrwxrwx   - cloudera supergroup          0 2022-09-29 21:17 /user/hive/warehouse/trendytech.db/orders
+
+#### Types of Tables in HIVE
+
+1. Managed Table
+2. External Table
+
+3. temporary table
+
+# What is a Managed Table?
+
+Managed Table is the one where HIVE manages the data also.
+that means Hive has complete control of the your data also
+drop a managed table
+both the data and metadata will be deleted.
+
+Hive Managed Table:
+
+In Managed Table, data is managed by Hive:
+1. Hive owns the files and directories
+2. Deleting a managed table deletes both data and metadata
+
+hive> use trendytech;
+OK
+Time taken: 0.034 seconds
+hive> create table test (id int, name string);
+OK
+Time taken: 0.401 seconds
+
+hive> show tables;
+OK
+customers
+orders
+test
+Time taken: 0.031 seconds, Fetched: 3 row(s)
+
+
+hive> insert into test values (1234,'Sumit');
+
+Query ID = cloudera_20220930194040_9f3e11b2-6b9e-46b7-93c9-8569054102fe
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1662730789713_0020, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1662730789713_0020/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1662730789713_00202022-09-30 19:41:40,215 Stage-1 map = 0%,  reduce = 0%
+2022-09-30 19:42:09,881 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 5.63 sec
+MapReduce Total cumulative CPU time: 5 seconds 630 msec
+Ended Job = job_1662730789713_0020
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/trendytech.db/test/.hive-staging_hive_2022-09-30_19-40-59_778_2843662176877331134-1/-ext-10000
+Loading data to table trendytech.test
+Table trendytech.test stats: [numFiles=1, numRows=1, totalSize=11, rawDataSize=10]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 5.63 sec   HDFS Read: 3877 HDFS Write: 82 SUCCESS
+Total MapReduce CPU Time Spent: 5 seconds 630 msec
+OK
+Time taken: 72.381 seconds
+
+1. We created table called test with two columns
+2. We have inserted record
+
+hive> select * from test;
+OK
+1234	Sumit
+Time taken: 0.161 seconds, Fetched: 1 row(s)
+
+# Navigating to file in Hive using dfs command
+
+hive> dfs -ls /user/hive/warehouse/trendytech.db;
+Found 3 items
+drwxrwxrwx   - cloudera supergroup          0 2022-09-28 11:25 /user/hive/warehouse/trendytech.db/customers
+drwxrwxrwx   - cloudera supergroup          0 2022-09-29 21:17 /user/hive/warehouse/trendytech.db/orders
+drwxrwxrwx   - cloudera supergroup          0 2022-09-30 19:42 /user/hive/warehouse/trendytech.db/test
+
+hive> dfs -ls /user/hive/warehouse/trendytech.db/test;
+Found 1 items
+-rwxrwxrwx   1 cloudera supergroup         11 2022-09-30 19:42 /user/hive/warehouse/trendytech.db/test/000000_0
+
+
+
+
