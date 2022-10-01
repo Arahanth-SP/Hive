@@ -324,7 +324,17 @@ Load the data from local file system
 3. load data from one table to another
 
 
+#Download the products.csv file into Cloudera Downloads folder:
 
+[cloudera@quickstart ~]$ cd Downloads
+[cloudera@quickstart Downloads]$ ls -pro*
+ls: invalid option -- '*'
+Try `ls --help' for more information.
+[cloudera@quickstart Downloads]$ ls pro*
+products.csv
+[cloudera@quickstart Downloads]$ 
+
+[cloudera@quickstart ~]$ ls -ltr
 
 
 
