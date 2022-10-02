@@ -21,3 +21,92 @@ Hierarchy is like this:
 •	src
 •	package name: (udf_example)
 •	class name: DataStandardization
+
+# Importing JAR Files in Eclipse Applications is done
+
+# Now coming back to Hive and Using trendytech database
+
+hive> use trendytech;
+OK
+Time taken: 1.831 seconds
+# Creating a Table sample_table
+
+create table if not exists sample_table(name string, count int) row format delimited fields terminated by ',' lines terminated by '\n' stored as textfile;
+
+hive> create table if not exists sample_table(name string, count int) row format delimited fields terminated by ',' lines terminated by '\n' stored as textfile; 
+OK
+Time taken: 0.901 seconds
+
+# Taking and copying Given Sample_data.txt into cloudera Downloads
+
+[cloudera@quickstart ~]$ cd Downloads/
+[cloudera@quickstart Downloads]$ cat sample_data.txt
+John,1500
+Albert,1500
+Mark,1000
+Frank,1150
+Loopa,1100
+Lui,1300
+John,1300
+John,900
+Lesa,1500
+Lesa,900
+Pars,800
+leo,700
+leo,1500
+lock,650
+Bhut,800
+Lio,500
+
+# Loading data into sample_table
+
+load data local inpath '/home/cloudera/Downloads/sample_data.txt' overwrite into 
+table sample_table;
+
+hive> load data local inpath '/home/cloudera/Downloads/sample_data.txt' overwrite into 
+    > table sample_table;
+Loading data to table trendytech.sample_table
+Table trendytech.sample_table stats: [numFiles=1, numRows=0, totalSize=153, rawDataSize=0]
+OK
+Time taken: 1.997 seconds
+
+
+hive> select * from sample_table;
+OK
+John	1500
+Albert	1500
+Mark	1000
+Frank	1150
+Loopa	1100
+Lui	1300
+John	1300
+John	900
+Lesa	1500
+Lesa	900
+Pars	800
+leo	700
+leo	1500
+lock	650
+Bhut	800
+Lio	500
+Time taken: 1.353 seconds, Fetched: 16 row(s)
+
+# Add the Jar & Create temporary function
+
+ADD JAR /home/cloudera/Desktop/udf_example.jar;
+
+create temporary function standardize as 
+'udf_example.DataStandardization';
+
+hive> ADD JAR /home/cloudera/Desktop/udf_example.jar;
+Added [/home/cloudera/Desktop/udf_example.jar] to class path
+Added resources: [/home/cloudera/Desktop/udf_example.jar]
+
+hive> create temporary function standardize as 
+    > 'udf_example.DataStandardization';
+OK
+Time taken: 0.032 seconds
+
+
+
+
