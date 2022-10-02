@@ -131,5 +131,49 @@ BHUT
 LIO
 Time taken: 0.335 seconds, Fetched: 16 row(s)
 
+cloudera@quickstart Desktop]$ hadoop fs -put udf_example.jar /user/cloudera
+
+[cloudera@quickstart Desktop]$ hadoop fs -ls
+Found 6 items
+drwxr-xr-x   - cloudera cloudera          0 2022-09-09 23:31 dir1
+drwxr-xr-x   - cloudera cloudera          0 2022-09-16 05:55 inputfolder
+drwxr-xr-x   - cloudera cloudera          0 2022-09-18 03:04 mapred_input
+drwxr-xr-x   - cloudera cloudera          0 2022-09-18 03:28 mapred_output
+drwxr-xr-x   - cloudera cloudera          0 2022-09-16 06:27 outputfolder
+-rw-r--r--   1 cloudera cloudera       1355 2022-10-01 21:04 udf_example.jar
+
+
+CREATE FUNCTION standardize_permanent AS
+'udf_example.DataStandardization' using JAR
+'hdfs://localhost:8020/user/cloudera/udf_example.jar';
+
+hive> CREATE FUNCTION standardize_permanent AS
+    > 'udf_example.DataStandardization' using JAR
+    > 'hdfs://localhost:8020/user/cloudera/udf_example.jar';
+converting to local hdfs://localhost:8020/user/cloudera/udf_example.jar
+Added [/tmp/b25545f8-d66c-4e16-a143-7bb1c3a93ee7_resources/udf_example.jar] to class path
+Added resources: [hdfs://localhost:8020/user/cloudera/udf_example.jar]
+OK
+Time taken: 0.337 seconds
+
+hive> select standardize_permanent(name) from sample_table;
+OK
+JOHN
+ALBERT
+MARK
+FRANK
+LOOPA
+LUI
+JOHN
+JOHN
+LESA
+LESA
+PARS
+LEO
+LEO
+LOCK
+BHUT
+LIO
+Time taken: 0.102 seconds, Fetched: 16 row(s)
 
 
