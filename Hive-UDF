@@ -107,6 +107,29 @@ hive> create temporary function standardize as
 OK
 Time taken: 0.032 seconds
 
+# Now we can use our User Defined Function standardize
+
+select standardize(name) from sample_table;
+
+hive> select standardize(name) from sample_table;
+OK
+JOHN
+ALBERT
+MARK
+FRANK
+LOOPA
+LUI
+JOHN
+JOHN
+LESA
+LESA
+PARS
+LEO
+LEO
+LOCK
+BHUT
+LIO
+Time taken: 0.335 seconds, Fetched: 16 row(s)
 
 
 
