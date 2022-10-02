@@ -1,0 +1,23 @@
+# Hive UDF
+
+Hive already has lot of inbuild functions.
+what will you do if none of the system defined functions fits your need.
+write your own user defined function (UDF).
+
+# For Writing User Defined Functions we need to write User Defined Functions
+
+Example: we want to convert all the names to upper case.
+we will be writing a UDF to convert all the names to upper case.
+
+# UDF done in Exclipse Application of Cloudera VM
+
+1.New-> Java Project
+2.project_name : (udf_example)
+3.package name: (udf_example)
+4. class name: DataStandardization
+
+Hierarchy is like this:
+•	project_name: (udf_example)
+•	src
+•	package name: (udf_example)
+•	class name: DataStandardization
